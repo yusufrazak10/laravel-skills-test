@@ -10,7 +10,7 @@
 <div class="container mt-5">
     <h2>Enter Product Details</h2>
     <!-- Product entry form -->
-    <form id="productForm">
+    <form id="productForm" method="POST" action="/product-entry">
         <!-- Product Name input -->
         <div class="mb-3">
             <label for="productName" class="form-label">Product Name</label>
@@ -52,7 +52,56 @@
     </form>
 </div>
 
+<script>
+// Handle form submission
+document.getElementById('productForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Stop default form action
+
+    // Get form data
+    const formData = new FormData(this);
+
+    // Send AJAX request
+    fetch('/product-entry', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => {
+        // Handle non-OK response
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
+    
+    // Handle success
+    .then(data => {
+        alert(data.message);
+        this.reset(); // Clear form
+    })
+    
+    // Handle errors
+    .catch(error => {
+        console.error('Error:', error);
+        if (error.errors) {
+            alert(Object.values(error.errors).join('\n'));
+        }
+    });
+});
+</script>
+
+
 <!-- Bootstrap JS bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+<?php
+
+
+    
+
